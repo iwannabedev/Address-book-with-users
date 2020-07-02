@@ -3,6 +3,7 @@
 #include <vector>
 #include <fstream>
 #include <sstream>
+#include <windows.h>
 
 using namespace std;
 
@@ -12,10 +13,12 @@ struct User {
 
 };
 
+short logInUser(vector<User> &users);
 void registerUser(vector<User> &users, short &numberOfUsers);
 void updateUsersDatabase(vector<User> &users);
 short importUsersDatabase(vector<User> &users, const char &DELIMITER);
 User splitLineOfText(vector<User> &users, string stringToSplit, const char &DELIMITER);
+
 
 int main(){
     system("chcp 1250");
@@ -25,30 +28,69 @@ int main(){
     vector<User> users;
     short numberOfUsers = 0;
     const char DELIMITER = '|';
+    short idOfLoggedOnUser = 0;
 
     numberOfUsers = importUsersDatabase(users, DELIMITER);
 
     while (true) {
-        system("cls");
-        cout << ">>MENU G£ÓWNE<<\n";
-        cout << "1. Logowanie\n";
-        cout << "2. Rejestracja\n";
-        cout << "9. Zamknij program\n\n";
+        if (idOfLoggedOnUser == 0) {
+            system("cls");
+            cout << ">>MENU G£ÓWNE<<\n";
+            cout << "1. Logowanie\n";
+            cout << "2. Rejestracja\n";
+            cout << "9. Zamknij program\n\n";
 
-        choice = getch();
+            choice = getch();
 
-        switch (choice) {
-            case '1':   break;
-            case '2':   registerUser(users, numberOfUsers);
-                        updateUsersDatabase(users);
-                        break;
-            case '9':   exit(0);
-                        break;
-            default:    cout << '\n' << "Niepoprawny wybór. Spróbuj ponownie." << '\n';
-                        system("pause");
+            switch (choice) {
+                case '1':   idOfLoggedOnUser = logInUser(users);
+                            break;
+                case '2':   registerUser(users, numberOfUsers);
+                            updateUsersDatabase(users);
+                            break;
+                case '9':   exit(0);
+                            break;
+                default:    cout << "\nNiepoprawny wybór. Spróbuj ponownie.\n";
+                            system("pause");
+            }
+        } else {
+            system("cls");
+            cout << "Zalogowany!\n";
         }
-
     }
+    return 0;
+}
+
+short logInUser(vector<User> &users){
+    vector<User>::iterator itr = users.begin(), lastUserPosition = users.end();
+    string typedInLogin, typedInPassword;
+    short numberOfAttempts = 3;
+
+    cout << "Podaj login: ";
+    cin >> typedInLogin;
+
+    for (itr; itr != lastUserPosition; ++itr) {
+        if (itr->login == typedInLogin) {
+            for (short numberOfAttempts = 0; numberOfAttempts < 3; numberOfAttempts++) {
+                cout << "Podaj haslo (iloœæ pozosta³ych prób: " << 3-numberOfAttempts << "): " ;
+                cin >> typedInPassword;
+
+                if (itr->password == typedInPassword) {
+                    cout << "Zalogowa³eœ siê. Otwieram Twoj¹ Ksi¹¿kê Adresow¹..." << endl;
+                    Sleep (1000);
+                    return itr->id;
+                }
+            }
+
+            cout << "Poda³es 3 razy b³êdne has³o. Poczekaj 5 sekund przed kolejn¹ prób¹.\n\n";
+            Sleep(5000);
+            return 0;
+        }
+    }
+
+    cout << "U¿ytkownik " << typedInLogin << " nie istnieje!\n";
+    system("pause");
+    return 0;
 }
 
 void registerUser(vector<User> &users, short &numberOfUsers) {
