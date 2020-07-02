@@ -30,3 +30,7 @@
 *.exe
 *.out
 *.app
+
+# Local DB files
+Uzytkownicy.txt
+Adresaci.txt
