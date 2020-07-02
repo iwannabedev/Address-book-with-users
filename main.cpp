@@ -2,6 +2,7 @@
 #include <conio.h>
 #include <vector>
 #include <fstream>
+#include <sstream>
 
 using namespace std;
 
@@ -13,12 +14,19 @@ struct User {
 
 void registerUser(vector<User> &users, short &numberOfUsers);
 void updateUsersDatabase(vector<User> &users);
+short importUsersDatabase(vector<User> &users, const char &DELIMITER);
+User splitLineOfText(vector<User> &users, string stringToSplit, const char &DELIMITER);
 
 int main(){
     system("chcp 1250");
+    system("cls");
+
     char choice = '0';
     vector<User> users;
     short numberOfUsers = 0;
+    const char DELIMITER = '|';
+
+    numberOfUsers = importUsersDatabase(users, DELIMITER);
 
     while (true) {
         system("cls");
@@ -86,4 +94,47 @@ void updateUsersDatabase(vector<User> &users) {
     }
 
     usersDatabase.close();
+}
+
+short importUsersDatabase(vector<User> &users, const char &DELIMITER) {
+    fstream usersDatabase;
+    usersDatabase.open("Uzytkownicy.txt", ios::in);
+    short lastUserID;
+
+    if (!usersDatabase.good()) {
+        system("cls");
+        cout << "\nBrak pliku z baz¹ u¿ytkowników! \n\n";
+        system("pause");
+    }
+
+    //Lines in text file count from 1, NOT from 0!
+    unsigned short lineOfTextCount = 1;
+    string lineOfText;
+
+    while (getline(usersDatabase, lineOfText)) {
+        users.emplace_back(splitLineOfText(users, lineOfText, DELIMITER));
+        lineOfTextCount++;
+    }
+
+    usersDatabase.close();
+
+    lastUserID = lineOfTextCount - 1;
+    return lastUserID;
+}
+
+User splitLineOfText(vector<User> &users, string lineOfText, const char& DELIMITER) {
+    stringstream ss(lineOfText);
+    string singleValueFromLineOfText;
+    vector<string> splittedStrings;
+    User registeredUser;
+
+    while (getline(ss, singleValueFromLineOfText, DELIMITER)) {
+       splittedStrings.emplace_back(singleValueFromLineOfText);
+    }
+
+    registeredUser.id = static_cast<short>(stoi(splittedStrings.at(0)));
+    registeredUser.login = splittedStrings.at(1);
+    registeredUser.password = splittedStrings.at(2);
+
+    return registeredUser;
 }
