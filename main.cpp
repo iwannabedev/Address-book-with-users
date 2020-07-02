@@ -1,6 +1,7 @@
 #include <iostream>
 #include <conio.h>
 #include <vector>
+#include <fstream>
 
 using namespace std;
 
@@ -11,6 +12,7 @@ struct User {
 };
 
 void registerUser(vector<User> &users, short &numberOfUsers);
+void updateUsersDatabase(vector<User> &users);
 
 int main(){
     system("chcp 1250");
@@ -30,6 +32,7 @@ int main(){
         switch (choice) {
             case '1':   break;
             case '2':   registerUser(users, numberOfUsers);
+                        updateUsersDatabase(users);
                         break;
             case '9':   exit(0);
                         break;
@@ -66,9 +69,21 @@ void registerUser(vector<User> &users, short &numberOfUsers) {
 
     cout << "Podaj has³o: ";
     cin >> registeredUser.password;
-    
+
     users.emplace_back(registeredUser);
-    
+
     cout << "Rejestracja zakoñczona" << endl;
     system("pause");
+}
+
+void updateUsersDatabase(vector<User> &users) {
+    vector<User>::iterator itr = users.begin(), lastUserPosition = users.end();
+    fstream usersDatabase;
+    usersDatabase.open("Uzytkownicy.txt", ios::out);
+
+    for (itr; itr != lastUserPosition; ++itr) {
+        usersDatabase << itr->id << "|" << itr->login << "|" << itr->password << "|\n";
+    }
+
+    usersDatabase.close();
 }
