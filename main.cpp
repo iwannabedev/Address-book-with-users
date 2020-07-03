@@ -55,7 +55,30 @@ int main(){
             }
         } else {
             system("cls");
-            cout << "Zalogowany!\n";
+            cout << ">>KSI¥¯KA ADRESOWA<<\n";
+            cout << "1. Dodaj adresata\n";
+            cout << "2. Wyszukaj po imieniu\n";
+            cout << "3. Wyszukaj po nazwisku\n";
+            cout << "4. Wyswietl wszystkich adresatow\n";
+            cout << "5. Usun adresata\n";
+            cout << "6. Edytuj adresata\n";
+            cout << "7. Zmieñ has³o\n";
+            cout << "9. Wyloguj siê\n";
+
+            choice = getch();
+
+            switch (choice) {
+                case '1':   break;
+                case '2':   break;
+                case '3':   break;
+                case '4':   break;
+                case '5':   break;
+                case '6':   break;
+                case '7':   break;
+                case '9':   break;
+                default:    cout << "\nNiepoprawny wybór. Spróbuj ponownie.\n";
+                            system("pause");
+            }
         }
     }
     return 0;
