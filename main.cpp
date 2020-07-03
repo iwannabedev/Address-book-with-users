@@ -75,7 +75,8 @@ int main(){
                 case '5':   break;
                 case '6':   break;
                 case '7':   break;
-                case '9':   break;
+                case '9':   idOfLoggedOnUser = 0;
+                            break;
                 default:    cout << "\nNiepoprawny wybór. Spróbuj ponownie.\n";
                             system("pause");
             }
