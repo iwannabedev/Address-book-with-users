@@ -26,6 +26,7 @@ User splitLineOfText(vector<User> &users, string stringToSplit, const char &DELI
 void importContactsDatabaseOfLoggedOnUser(vector<PhoneBook> &contacts, short idOfLoggedOnUser, const char &DELIMITER);
 void displayContacts(vector<PhoneBook> &contacts);
 void changeUsersPassword(vector<User> &users, short &idOfLoggedOnUser);
+unsigned short countNumberOfContacts(vector<PhoneBook> &contacts);
 
 int main(){
     system("chcp 1250");
@@ -40,6 +41,7 @@ int main(){
     short idOfLoggedOnUser = 0;
 
     numberOfUsers = importUsersDatabase(users, DELIMITER);
+    lastContactID = countNumberOfContacts(contacts);
 
     while (true) {
         if (idOfLoggedOnUser == 0) {
@@ -302,4 +304,17 @@ void changeUsersPassword(vector<User> &users, short &idOfLoggedOnUser){
         system("pause");
     }
     dbFile.close();
+}
+
+unsigned short countNumberOfContacts(vector<PhoneBook> &contacts) {
+    unsigned short numberOfContacts = 0;
+    string lineOfText;
+    fstream dbFile;
+    dbFile.open("Adresaci.txt", ios::in);
+
+    while (getline(dbFile, lineOfText)) {
+        numberOfContacts++;
+    }
+
+    return numberOfContacts;
 }
