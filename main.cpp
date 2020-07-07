@@ -13,12 +13,17 @@ struct User {
 
 };
 
+struct PhoneBook {
+    short contactID, userID;
+    string firstName, lastName, phoneNo, email, address;
+};
+
 short logInUser(vector<User> &users);
 void registerUser(vector<User> &users, short &numberOfUsers);
 void updateUsersDatabase(vector<User> &users);
 short importUsersDatabase(vector<User> &users, const char &DELIMITER);
 User splitLineOfText(vector<User> &users, string stringToSplit, const char &DELIMITER);
-
+void importContactsDatabaseOfLoggedOnUser(vector<PhoneBook> &contacts, short idOfLoggedOnUser, const char &DELIMITER);
 
 int main(){
     system("chcp 1250");
@@ -26,7 +31,9 @@ int main(){
 
     char choice = '0';
     vector<User> users;
+    vector<PhoneBook> contacts;
     short numberOfUsers = 0;
+    unsigned short lastContactID = 0;
     const char DELIMITER = '|';
     short idOfLoggedOnUser = 0;
 
@@ -35,7 +42,7 @@ int main(){
     while (true) {
         if (idOfLoggedOnUser == 0) {
             system("cls");
-            cout << ">>MENU G£ÓWNE<<\n";
+            cout << ">>MENU GLÓWNE<<\n";
             cout << "1. Logowanie\n";
             cout << "2. Rejestracja\n";
             cout << "9. Zamknij program\n\n";
@@ -54,16 +61,18 @@ int main(){
                             system("pause");
             }
         } else {
+            importContactsDatabaseOfLoggedOnUser(contacts, idOfLoggedOnUser, DELIMITER);
+
             system("cls");
-            cout << ">>KSI¥¯KA ADRESOWA<<\n";
+            cout << ">>KSIY—KA ADRESOWA<<\n";
             cout << "1. Dodaj adresata\n";
             cout << "2. Wyszukaj po imieniu\n";
             cout << "3. Wyszukaj po nazwisku\n";
             cout << "4. Wyswietl wszystkich adresatow\n";
             cout << "5. Usun adresata\n";
             cout << "6. Edytuj adresata\n";
-            cout << "7. Zmieñ has³o\n";
-            cout << "9. Wyloguj siê\n";
+            cout << "7. Zmien has3o\n";
+            cout << "9. Wyloguj sie\n";
 
             choice = getch();
 
@@ -96,23 +105,23 @@ short logInUser(vector<User> &users){
     for (itr; itr != lastUserPosition; ++itr) {
         if (itr->login == typedInLogin) {
             for (short numberOfAttempts = 0; numberOfAttempts < 3; numberOfAttempts++) {
-                cout << "Podaj haslo (iloœæ pozosta³ych prób: " << 3-numberOfAttempts << "): " ;
+                cout << "Podaj haslo (ilooa pozosta3ych prób: " << 3-numberOfAttempts << "): " ;
                 cin >> typedInPassword;
 
                 if (itr->password == typedInPassword) {
-                    cout << "Zalogowa³eœ siê. Otwieram Twoj¹ Ksi¹¿kê Adresow¹..." << endl;
+                    cout << "Zalogowa3eo sie. Otwieram Twoj1 Ksi1?ke Adresow1..." << endl;
                     Sleep (1000);
                     return itr->id;
                 }
             }
 
-            cout << "Poda³es 3 razy b³êdne has³o. Poczekaj 5 sekund przed kolejn¹ prób¹.\n\n";
+            cout << "Poda3es 3 razy b3edne has3o. Poczekaj 5 sekund przed kolejn1 prób1.\n\n";
             Sleep(5000);
             return 0;
         }
     }
 
-    cout << "U¿ytkownik " << typedInLogin << " nie istnieje!\n";
+    cout << "U?ytkownik " << typedInLogin << " nie istnieje!\n";
     system("pause");
     return 0;
 }
@@ -141,12 +150,12 @@ void registerUser(vector<User> &users, short &numberOfUsers) {
     registeredUser.id = ++numberOfUsers;
     registeredUser.login = userName;
 
-    cout << "Podaj has³o: ";
+    cout << "Podaj has3o: ";
     cin >> registeredUser.password;
 
     users.emplace_back(registeredUser);
 
-    cout << "Rejestracja zakoñczona" << endl;
+    cout << "Rejestracja zakonczona" << endl;
     system("pause");
 }
 
@@ -169,7 +178,7 @@ short importUsersDatabase(vector<User> &users, const char &DELIMITER) {
 
     if (!usersDatabase.good()) {
         system("cls");
-        cout << "\nBrak pliku z baz¹ u¿ytkowników! \n\n";
+        cout << "\nBrak pliku z baz1 u?ytkowników! \n\n";
         system("pause");
     }
 
@@ -203,4 +212,49 @@ User splitLineOfText(vector<User> &users, string lineOfText, const char& DELIMIT
     registeredUser.password = splittedStrings.at(2);
 
     return registeredUser;
+}
+
+void importContactsDatabaseOfLoggedOnUser(vector<PhoneBook> &contacts, short idOfLoggedOnUser, const char &DELIMITER) {
+    fstream dbFile;
+    dbFile.open("Adresaci.txt", ios::in);
+
+    string singleValueFromLineOfText;
+    vector<string> splittedStrings;
+    PhoneBook person;
+
+    if (!dbFile.good()) {
+        system("cls");
+        cout << "\nBrak pliku z baz¹ kontaktów\n\n";
+        system("pause");
+    }
+
+    //Lines in text file count from 1, NOT from 0!
+    unsigned short lineOfTextCount = 1;
+    string lineOfText;
+
+    contacts.clear();
+
+    while (getline(dbFile, lineOfText)) {
+        stringstream ss(lineOfText);
+
+        while (getline(ss, singleValueFromLineOfText, DELIMITER)) {
+            splittedStrings.emplace_back(singleValueFromLineOfText);
+        }
+
+        //if userID == idOfLoggedOnUser
+        if (stoi(splittedStrings.at(1)) == idOfLoggedOnUser) {
+            person.contactID = stoi(splittedStrings.at(0));
+            person.userID = stoi(splittedStrings.at(1));
+            person.firstName = splittedStrings.at(2);
+            person.lastName = splittedStrings.at(3);
+            person.phoneNo = splittedStrings.at(4);
+            person.email = splittedStrings.at(5);
+            person.address = splittedStrings.at(6);
+            contacts.emplace_back(person);
+        }
+        splittedStrings.clear();
+        lineOfTextCount++;
+    }
+
+    dbFile.close();
 }
