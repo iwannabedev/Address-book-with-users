@@ -25,6 +25,7 @@ short importUsersDatabase(vector<User> &users, const char &DELIMITER);
 User splitLineOfText(vector<User> &users, string stringToSplit, const char &DELIMITER);
 void importContactsDatabaseOfLoggedOnUser(vector<PhoneBook> &contacts, short idOfLoggedOnUser, const char &DELIMITER);
 void displayContacts(vector<PhoneBook> &contacts);
+void changeUsersPassword(vector<User> &users, short &idOfLoggedOnUser);
 
 int main(){
     system("chcp 1250");
@@ -86,7 +87,8 @@ int main(){
                             break;
                 case '5':   break;
                 case '6':   break;
-                case '7':   break;
+                case '7':   changeUsersPassword(users, idOfLoggedOnUser);
+                            break;
                 case '9':   idOfLoggedOnUser = 0;
                             break;
                 default:    cout << "\nNiepoprawny wybór. Spróbuj ponownie.\n";
@@ -272,4 +274,32 @@ void displayContacts(vector<PhoneBook> &contacts) {
              << itr->phoneNo << " | " << itr->email <<  " | " << itr->address << " | " << '\n';
     }
     cout << '\n';
+}
+
+void changeUsersPassword(vector<User> &users, short &idOfLoggedOnUser){
+    string password1, password2;
+    short indexOfLoggedOnUser = idOfLoggedOnUser - 1;
+    vector<User>::iterator itr = users.begin(), lastUserPosition = users.end();
+    fstream dbFile;
+    dbFile.open("Uzytkownicy.txt", ios::out);
+
+    cout << "\nPodaj nowe has³o: ";
+    cin >> password1;
+    cout << "Podaj ponownie nowe has³o: ";
+    cin >> password2;
+
+    if (password1 == password2) {
+        users.at(indexOfLoggedOnUser).password = password1;
+
+        for (itr; itr != lastUserPosition; ++itr) {
+            dbFile << itr->id << '|' << itr->login << '|' << itr->password<< '|' << '\n';
+        }
+
+        cout << "\nHas³o zosta³o pomyœlnie zmienione!\n";
+        system("pause");
+    } else {
+        cout << "Wprowadzone has³a s¹ od siebie ró¿ne! Zmiana has³a zakoñczona niepowodzeniem.\n";
+        system("pause");
+    }
+    dbFile.close();
 }
