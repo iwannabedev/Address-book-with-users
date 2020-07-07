@@ -24,6 +24,7 @@ void updateUsersDatabase(vector<User> &users);
 short importUsersDatabase(vector<User> &users, const char &DELIMITER);
 User splitLineOfText(vector<User> &users, string stringToSplit, const char &DELIMITER);
 void importContactsDatabaseOfLoggedOnUser(vector<PhoneBook> &contacts, short idOfLoggedOnUser, const char &DELIMITER);
+void displayContacts(vector<PhoneBook> &contacts);
 
 int main(){
     system("chcp 1250");
@@ -80,7 +81,9 @@ int main(){
                 case '1':   break;
                 case '2':   break;
                 case '3':   break;
-                case '4':   break;
+                case '4':   displayContacts(contacts);
+                            system("pause");
+                            break;
                 case '5':   break;
                 case '6':   break;
                 case '7':   break;
@@ -257,4 +260,16 @@ void importContactsDatabaseOfLoggedOnUser(vector<PhoneBook> &contacts, short idO
     }
 
     dbFile.close();
+}
+
+void displayContacts(vector<PhoneBook> &contacts) {
+    vector<PhoneBook>::iterator itr = contacts.begin(), lastContactPosition = contacts.end();
+
+    system("cls");
+
+    for (itr; itr != lastContactPosition; ++itr ) {
+        cout << itr->contactID << " | " << itr->userID << " | "  << itr->firstName << " | " << itr->lastName << " | "
+             << itr->phoneNo << " | " << itr->email <<  " | " << itr->address << " | " << '\n';
+    }
+    cout << '\n';
 }
