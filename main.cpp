@@ -23,7 +23,8 @@ void registerUser(vector<User> &users, short &numberOfUsers);
 void updateUsersDatabase(vector<User> &users);
 short importUsersDatabase(vector<User> &users, const char &DELIMITER);
 User splitLineOfText(vector<User> &users, string stringToSplit, const char &DELIMITER);
-void importContactsDatabaseOfLoggedOnUser(vector<PhoneBook> &contacts, short idOfLoggedOnUser, const char &DELIMITER);
+void importContactsDatabaseOfLoggedOnUser(vector<PhoneBook> &contacts, short &idOfLoggedOnUser, const char &DELIMITER);
+void addContact(vector<PhoneBook> &contacts, unsigned short &lastContactID, short &idOfLoggedOnUser);
 void displayContacts(vector<PhoneBook> &contacts);
 void changeUsersPassword(vector<User> &users, short &idOfLoggedOnUser);
 unsigned short countNumberOfContacts(vector<PhoneBook> &contacts);
@@ -81,7 +82,8 @@ int main(){
             choice = getch();
 
             switch (choice) {
-                case '1':   break;
+                case '1':   addContact(contacts, lastContactID, idOfLoggedOnUser);
+                            break;
                 case '2':   break;
                 case '3':   break;
                 case '4':   displayContacts(contacts);
@@ -221,7 +223,7 @@ User splitLineOfText(vector<User> &users, string lineOfText, const char& DELIMIT
     return registeredUser;
 }
 
-void importContactsDatabaseOfLoggedOnUser(vector<PhoneBook> &contacts, short idOfLoggedOnUser, const char &DELIMITER) {
+void importContactsDatabaseOfLoggedOnUser(vector<PhoneBook> &contacts, short &idOfLoggedOnUser, const char &DELIMITER) {
     fstream dbFile;
     dbFile.open("Adresaci.txt", ios::in);
 
@@ -264,6 +266,28 @@ void importContactsDatabaseOfLoggedOnUser(vector<PhoneBook> &contacts, short idO
     }
 
     dbFile.close();
+}
+
+void addContact(vector<PhoneBook> &contacts, unsigned short &lastContactID, short &idOfLoggedOnUser) {
+    PhoneBook person;
+
+    system("cls");
+    person.contactID = lastContactID + 1;
+    lastContactID++;
+    person.userID = idOfLoggedOnUser;
+    cout << "Podaj imie: ";
+    cin >> person.firstName;
+    cout << "Podaj nazwisko: ";
+    cin >> person.lastName;
+    cout << "Podaj nr telefonu: ";
+    cin >> person.phoneNo;
+    cout << "Podaj adres email: ";
+    cin >> person.email;
+    cout << "Podaj pelny adres (ulica [nr], kod pocztowy, miasto): ";
+    cin.sync();
+    getline(cin, person.address);
+
+    contacts.emplace_back(person);
 }
 
 void displayContacts(vector<PhoneBook> &contacts) {
