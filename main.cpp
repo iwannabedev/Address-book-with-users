@@ -26,6 +26,7 @@ User splitLineOfText(vector<User> &users, string stringToSplit, const char &DELI
 void importContactsDatabaseOfLoggedOnUser(vector<PhoneBook> &contacts, short &idOfLoggedOnUser, const char &DELIMITER);
 void addContact(vector<PhoneBook> &contacts, unsigned short &lastContactID, short &idOfLoggedOnUser);
 void updateContactsDatabase(vector<PhoneBook> &contacts, const char &DELIMITER);
+void findContacts(vector<PhoneBook> &contacts, unsigned short &lastContactID, bool &searchModeSwitch);
 void displayContacts(vector<PhoneBook> &contacts);
 void changeUsersPassword(vector<User> &users, short &idOfLoggedOnUser);
 unsigned short countNumberOfContacts(vector<PhoneBook> &contacts);
@@ -68,6 +69,7 @@ int main(){
             }
         } else {
             importContactsDatabaseOfLoggedOnUser(contacts, idOfLoggedOnUser, DELIMITER);
+            bool searchModeSwitch = false, FirstNameSearch = true, LastNameSearch = false;
 
             system("cls");
             cout << ">>KSIY—KA ADRESOWA<<\n";
@@ -86,8 +88,12 @@ int main(){
                 case '1':   addContact(contacts, lastContactID, idOfLoggedOnUser);
                             updateContactsDatabase(contacts, DELIMITER);
                             break;
-                case '2':   break;
-                case '3':   break;
+                case '2':   searchModeSwitch = FirstNameSearch;
+                            findContacts(contacts, lastContactID, searchModeSwitch);
+                            break;
+                case '3':   searchModeSwitch = LastNameSearch;
+                            findContacts(contacts, lastContactID, searchModeSwitch);
+                            break;
                 case '4':   displayContacts(contacts);
                             system("pause");
                             break;
@@ -339,6 +345,43 @@ void updateContactsDatabase(vector<PhoneBook> &contacts, const char &DELIMITER) 
     char oldName[] = "Adresaci_tymczasowy.txt";
     char newName[] = "Adresaci.txt";
     rename(oldName, newName);
+}
+
+void findContacts(vector<PhoneBook> &contacts, unsigned short &lastContactID, bool &searchModeSwitch) {
+    bool contactFound = false;
+    vector<PhoneBook>::iterator itr = contacts.begin(), lastContactPosition = contacts.end();
+    string newValue = "", oldValue = "";
+
+    system("cls");
+
+    //search by firstName
+    if (searchModeSwitch == true) {
+        cout << "Podaj imie do wyszukania: ";
+    }
+    //search by lastName
+    else {
+        cout << "Podaj nazwisko do wyszukania: ";
+    }
+
+    cin >> newValue;
+
+    for (itr; itr != lastContactPosition; ++itr) {
+        oldValue = (searchModeSwitch) ? itr->firstName : itr->lastName;
+
+        if (oldValue == newValue) {
+            cout << itr->contactID << " | " << itr->userID << " | " << itr->firstName << " | " << itr->lastName << " | "
+                 << itr->phoneNo << " | " << itr->email <<  " | " << itr->address << " | " << '\n';
+            contactFound = true;
+        }
+    }
+
+    if (!contactFound) {
+        cout << '\n' << "Zaden kontakt nie spelnia kryterium wyszukiwania." << '\n' << '\n';
+        system("pause");
+    } else {
+        cout << '\n';
+        system("pause");
+    }
 }
 
 void displayContacts(vector<PhoneBook> &contacts) {
