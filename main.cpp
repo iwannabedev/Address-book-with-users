@@ -25,6 +25,7 @@ short importUsersDatabase(vector<User> &users, const char &DELIMITER);
 User splitLineOfText(vector<User> &users, string stringToSplit, const char &DELIMITER);
 void importContactsDatabaseOfLoggedOnUser(vector<PhoneBook> &contacts, short &idOfLoggedOnUser, const char &DELIMITER);
 void addContact(vector<PhoneBook> &contacts, unsigned short &lastContactID, short &idOfLoggedOnUser);
+void updateContactsDatabase(vector<PhoneBook> &contacts, const char &DELIMITER);
 void displayContacts(vector<PhoneBook> &contacts);
 void changeUsersPassword(vector<User> &users, short &idOfLoggedOnUser);
 unsigned short countNumberOfContacts(vector<PhoneBook> &contacts);
@@ -83,6 +84,7 @@ int main(){
 
             switch (choice) {
                 case '1':   addContact(contacts, lastContactID, idOfLoggedOnUser);
+                            updateContactsDatabase(contacts, DELIMITER);
                             break;
                 case '2':   break;
                 case '3':   break;
@@ -288,6 +290,55 @@ void addContact(vector<PhoneBook> &contacts, unsigned short &lastContactID, shor
     getline(cin, person.address);
 
     contacts.emplace_back(person);
+}
+
+void updateContactsDatabase(vector<PhoneBook> &contacts, const char &DELIMITER) {
+    vector<PhoneBook>::iterator itr = contacts.begin(), lastContactPosition = contacts.end();
+    fstream dbFile, dbTempFile;
+    dbFile.open("Adresaci.txt", ios::in);
+    dbTempFile.open("Adresaci_tymczasowy.txt", ios::out);
+    string lineOfText;
+    string singleValueFromLineOfText;
+    vector<string> splittedStrings;
+    PhoneBook person;
+    lastContactPosition--;
+
+    while (getline(dbFile, lineOfText)) {
+        stringstream ss(lineOfText);
+
+        while (getline(ss, singleValueFromLineOfText, DELIMITER)) {
+           splittedStrings.emplace_back(singleValueFromLineOfText);
+        }
+
+        person.contactID = stoi(splittedStrings.at(0));
+        person.userID = stoi(splittedStrings.at(1));
+        person.firstName = splittedStrings.at(2);
+        person.lastName = splittedStrings.at(3);
+        person.phoneNo = splittedStrings.at(4);
+        person.email = splittedStrings.at(5);
+        person.address = splittedStrings.at(6);
+
+        if (person.contactID == lastContactPosition->contactID) {
+            dbTempFile << lastContactPosition->contactID << '|' << lastContactPosition->userID << '|' << lastContactPosition->firstName
+                << '|' << lastContactPosition->lastName << '|' << lastContactPosition->phoneNo << '|' << lastContactPosition->email
+                << '|' << lastContactPosition->address << '|' << '\n';
+        } else {
+            dbTempFile << lineOfText << '\n';
+        }
+    }
+
+    if (person.contactID < lastContactPosition->contactID) {
+        dbTempFile << lastContactPosition->contactID << '|' << lastContactPosition->userID << '|' << lastContactPosition->firstName
+        << '|' << lastContactPosition->lastName << '|' << lastContactPosition->phoneNo << '|' << lastContactPosition->email
+        << '|' << lastContactPosition->address << '|' << '\n';
+    }
+
+    dbFile.close();
+    remove("Adresaci.txt");
+    dbTempFile.close();
+    char oldName[] = "Adresaci_tymczasowy.txt";
+    char newName[] = "Adresaci.txt";
+    rename(oldName, newName);
 }
 
 void displayContacts(vector<PhoneBook> &contacts) {
