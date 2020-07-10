@@ -23,14 +23,13 @@ void registerUser(vector<User> &users, short &numberOfUsers);
 void updateUsersDatabase(vector<User> &users);
 short importUsersDatabase(vector<User> &users, const char &DELIMITER);
 User splitLineOfText(vector<User> &users, string stringToSplit, const char &DELIMITER);
-void importContactsDatabaseOfLoggedOnUser(vector<PhoneBook> &contacts, short &idOfLoggedOnUser, const char &DELIMITER);
+unsigned short importContactsDatabaseOfLoggedOnUser(vector<PhoneBook> &contacts, short &idOfLoggedOnUser, const char &DELIMITER);
 void addContact(vector<PhoneBook> &contacts, unsigned short &lastContactID, short &idOfLoggedOnUser);
 void updateContactsDatabase(vector<PhoneBook> &contacts, const char &DELIMITER);
 void findContacts(vector<PhoneBook> &contacts, unsigned short &lastContactID, bool &searchModeSwitch);
 void displayContacts(vector<PhoneBook> &contacts);
 void editContact(vector<PhoneBook> &contacts, unsigned short &lastContactID);
 void changeUsersPassword(vector<User> &users, short &idOfLoggedOnUser);
-unsigned short countNumberOfContacts(vector<PhoneBook> &contacts);
 
 int main(){
     system("chcp 1250");
@@ -45,7 +44,6 @@ int main(){
     short idOfLoggedOnUser = 0;
 
     numberOfUsers = importUsersDatabase(users, DELIMITER);
-    lastContactID = countNumberOfContacts(contacts);
 
     while (true) {
         if (idOfLoggedOnUser == 0) {
@@ -69,7 +67,7 @@ int main(){
                             system("pause");
             }
         } else {
-            importContactsDatabaseOfLoggedOnUser(contacts, idOfLoggedOnUser, DELIMITER);
+            lastContactID = importContactsDatabaseOfLoggedOnUser(contacts, idOfLoggedOnUser, DELIMITER);
             bool searchModeSwitch = false, FirstNameSearch = true, LastNameSearch = false;
 
             system("cls");
@@ -233,23 +231,20 @@ User splitLineOfText(vector<User> &users, string lineOfText, const char& DELIMIT
     return registeredUser;
 }
 
-void importContactsDatabaseOfLoggedOnUser(vector<PhoneBook> &contacts, short &idOfLoggedOnUser, const char &DELIMITER) {
+unsigned short importContactsDatabaseOfLoggedOnUser(vector<PhoneBook> &contacts, short &idOfLoggedOnUser, const char &DELIMITER) {
     fstream dbFile;
     dbFile.open("Adresaci.txt", ios::in);
-
     string singleValueFromLineOfText;
     vector<string> splittedStrings;
+    string lineOfText;
     PhoneBook person;
+    unsigned short lastContactID;
 
     if (!dbFile.good()) {
         system("cls");
-        cout << "\nBrak pliku z baz¹ kontaktów\n\n";
+        cout << "\nBrak pliku z baz¹ kontaktów!\n\n";
         system("pause");
     }
-
-    //Lines in text file count from 1, NOT from 0!
-    unsigned short lineOfTextCount = 1;
-    string lineOfText;
 
     contacts.clear();
 
@@ -259,7 +254,7 @@ void importContactsDatabaseOfLoggedOnUser(vector<PhoneBook> &contacts, short &id
         while (getline(ss, singleValueFromLineOfText, DELIMITER)) {
             splittedStrings.emplace_back(singleValueFromLineOfText);
         }
-
+        
         //if userID == idOfLoggedOnUser
         if (stoi(splittedStrings.at(1)) == idOfLoggedOnUser) {
             person.contactID = stoi(splittedStrings.at(0));
@@ -271,11 +266,13 @@ void importContactsDatabaseOfLoggedOnUser(vector<PhoneBook> &contacts, short &id
             person.address = splittedStrings.at(6);
             contacts.emplace_back(person);
         }
+        
+        lastContactID = person.contactID;
         splittedStrings.clear();
-        lineOfTextCount++;
     }
-
+    
     dbFile.close();
+    return lastContactID;
 }
 
 void addContact(vector<PhoneBook> &contacts, unsigned short &lastContactID, short &idOfLoggedOnUser) {
@@ -481,17 +478,4 @@ void changeUsersPassword(vector<User> &users, short &idOfLoggedOnUser){
         system("pause");
     }
     dbFile.close();
-}
-
-unsigned short countNumberOfContacts(vector<PhoneBook> &contacts) {
-    unsigned short numberOfContacts = 0;
-    string lineOfText;
-    fstream dbFile;
-    dbFile.open("Adresaci.txt", ios::in);
-
-    while (getline(dbFile, lineOfText)) {
-        numberOfContacts++;
-    }
-
-    return numberOfContacts;
 }
