@@ -28,6 +28,7 @@ void addContact(vector<PhoneBook> &contacts, unsigned short &lastContactID, shor
 void updateContactsDatabase(vector<PhoneBook> &contacts, const char &DELIMITER);
 void findContacts(vector<PhoneBook> &contacts, unsigned short &lastContactID, bool &searchModeSwitch);
 void displayContacts(vector<PhoneBook> &contacts);
+void editContact(vector<PhoneBook> &contacts, unsigned short &lastContactID);
 void changeUsersPassword(vector<User> &users, short &idOfLoggedOnUser);
 unsigned short countNumberOfContacts(vector<PhoneBook> &contacts);
 
@@ -98,7 +99,8 @@ int main(){
                             system("pause");
                             break;
                 case '5':   break;
-                case '6':   break;
+                case '6':   editContact(contacts, lastContactID);
+                            break;
                 case '7':   changeUsersPassword(users, idOfLoggedOnUser);
                             break;
                 case '9':   idOfLoggedOnUser = 0;
@@ -394,6 +396,63 @@ void displayContacts(vector<PhoneBook> &contacts) {
              << itr->phoneNo << " | " << itr->email <<  " | " << itr->address << " | " << '\n';
     }
     cout << '\n';
+}
+
+void editContact(vector<PhoneBook> &contacts, unsigned short &lastContactID) {
+    char choice = ' ';
+    short contactIDToEdit = 0;
+    bool IDSearchSuccessful = false;
+    vector<PhoneBook>::iterator itr = contacts.begin(), lastContactPosition = contacts.end();
+
+    displayContacts(contacts);
+
+    cout << "Podaj ID kontaktu, ktory chcesz edytowac: ";
+    cin >> contactIDToEdit;
+
+    system("cls");
+    cout << "Ktora informacje chcesz zmienic?: \n";
+    cout << "1 - imie\n";
+    cout << "2 - nazwisko\n";
+    cout << "3 - numer telefonu\n";
+    cout << "4 - email\n";
+    cout << "5 - adres\n";
+    cout << "6 - powrot do menu\n\n";
+    choice = getch();
+    cout << "Twoj wybor: " << choice << '\n';
+
+    for (itr; itr != lastContactPosition; ++itr) {
+        if (itr->contactID == contactIDToEdit) {
+            IDSearchSuccessful = true;
+            switch (choice) {
+                case '1':   cout << "Podaj nowe imie: ";
+                            cin >> itr->firstName;
+
+                            break;
+                case '2':   cout << "Podaj nowe nazwisko: ";
+                            cin >> itr->lastName;
+                            break;
+                case '3':   cout << "Podaj nowy numer telefonu: ";
+                            cin >> itr->phoneNo;
+                            break;
+                case '4':   cout << "Podaj nowy email: ";
+                            cin >> itr->email;
+                            break;
+                case '5':   cout << "Podaj nowe adres: ";
+                            cin >> itr->address;
+                            break;
+                case '6':   break;
+                default:    cout << "\nNiepoprawny wybor. Spróbuj ponownie.\n";
+                            system("pause");
+            }
+        }
+    }
+
+    if (!IDSearchSuccessful) {
+        cout << "\nBrak kontaktu o podanym ID.\n";
+        system("pause");
+    }
+
+//    updateContactsDatabase
 }
 
 void changeUsersPassword(vector<User> &users, short &idOfLoggedOnUser){
