@@ -28,6 +28,7 @@ unsigned short addContact(vector<PhoneBook> &contacts, unsigned short &lastConta
 void updateContactsDatabase(vector<PhoneBook> &contacts, const char &DELIMITER, unsigned short &idOfLastAddedModifiedOrDeletedContact);
 void findContacts(vector<PhoneBook> &contacts, unsigned short &lastContactIDinDB, bool &searchModeSwitch);
 void displayContacts(vector<PhoneBook> &contacts);
+unsigned short deleteContact(vector<PhoneBook> &contacts);
 unsigned short editContact(vector<PhoneBook> &contacts);
 void changeUsersPassword(vector<User> &users, short &idOfLoggedOnUser);
 
@@ -97,7 +98,9 @@ int main(){
                 case '4':   displayContacts(contacts);
                             system("pause");
                             break;
-                case '5':   break;
+                case '5':   idOfLastAddedModifiedOrDeletedContact = deleteContact(contacts);
+                            updateContactsDatabase(contacts, DELIMITER, idOfLastAddedModifiedOrDeletedContact);
+                            break;
                 case '6':   idOfLastAddedModifiedOrDeletedContact = editContact(contacts);
                             updateContactsDatabase(contacts, DELIMITER, idOfLastAddedModifiedOrDeletedContact);
                             break;
@@ -327,7 +330,7 @@ void updateContactsDatabase(vector<PhoneBook> &contacts, const char &DELIMITER, 
         person.address = splittedStrings.at(6);
 
         splittedStrings.clear();
-        //adding edited contact
+        //adding edited or deleted contact
         if (person.contactID == idOfLastAddedModifiedOrDeletedContact) {
             for (itr; itr != lastContactPosition; ++itr) {
                 if (itr->contactID == idOfLastAddedModifiedOrDeletedContact) {
@@ -404,6 +407,40 @@ void displayContacts(vector<PhoneBook> &contacts) {
              << itr->phoneNo << " | " << itr->email <<  " | " << itr->address << " | " << '\n';
     }
     cout << '\n';
+}
+
+unsigned short deleteContact(vector<PhoneBook> &contacts) {
+    unsigned short choice = 0;
+    char choiceConfirmed = ' ';
+    bool canBeDeleted = false;
+    vector<PhoneBook>::iterator itr = contacts.begin(), lastContactPosition = contacts.end();
+
+    displayContacts(contacts);
+
+    cout << "\nPodaj ID kontaktu, ktory chcesz usunac: ";
+    cin >> choice;
+
+    for (itr; itr != lastContactPosition; ++itr) {
+        if (itr->contactID == choice) {
+            cout << "Czy na pewno chcesz usunac ten kontakt? Potwierdz: [t/n]?";
+            choiceConfirmed = getch();
+
+            if (choiceConfirmed == 't') {
+                canBeDeleted = true;
+                itr = contacts.erase(itr);
+                cout << "\nKontakt zostal pomyslnie usuniety.\n";
+                system("pause");
+                break;
+            }
+        }
+    }
+
+    if (canBeDeleted) {
+        return choice;
+    } else {
+        cout << "Brak kontaktu o podanym ID.\n";
+        system("pause");
+    }
 }
 
 unsigned short editContact(vector<PhoneBook> &contacts) {
