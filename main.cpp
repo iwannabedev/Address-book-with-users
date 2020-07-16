@@ -24,11 +24,11 @@ void updateUsersDatabase(vector<User> &users);
 short importUsersDatabase(vector<User> &users, const char &DELIMITER);
 User splitLineOfText(vector<User> &users, string stringToSplit, const char &DELIMITER);
 unsigned short importContactsDatabaseOfLoggedOnUser(vector<PhoneBook> &contacts, short &idOfLoggedOnUser, const char &DELIMITER);
-void addContact(vector<PhoneBook> &contacts, unsigned short &lastContactID, short &idOfLoggedOnUser);
+void addContact(vector<PhoneBook> &contacts, unsigned short &lastContactIDinDB, short &idOfLoggedOnUser);
 void updateContactsDatabase(vector<PhoneBook> &contacts, const char &DELIMITER);
-void findContacts(vector<PhoneBook> &contacts, unsigned short &lastContactID, bool &searchModeSwitch);
+void findContacts(vector<PhoneBook> &contacts, unsigned short &lastContactIDinDB, bool &searchModeSwitch);
 void displayContacts(vector<PhoneBook> &contacts);
-void editContact(vector<PhoneBook> &contacts, unsigned short &lastContactID);
+void editContact(vector<PhoneBook> &contacts, unsigned short &lastContactIDinDB);
 void changeUsersPassword(vector<User> &users, short &idOfLoggedOnUser);
 
 int main(){
@@ -39,7 +39,7 @@ int main(){
     vector<User> users;
     vector<PhoneBook> contacts;
     short numberOfUsers = 0;
-    unsigned short lastContactID = 0;
+    unsigned short lastContactIDinDB = 0;
     const char DELIMITER = '|';
     short idOfLoggedOnUser = 0;
 
@@ -67,7 +67,7 @@ int main(){
                             system("pause");
             }
         } else {
-            lastContactID = importContactsDatabaseOfLoggedOnUser(contacts, idOfLoggedOnUser, DELIMITER);
+            lastContactIDinDB = importContactsDatabaseOfLoggedOnUser(contacts, idOfLoggedOnUser, DELIMITER);
             bool searchModeSwitch = false, FirstNameSearch = true, LastNameSearch = false;
 
             system("cls");
@@ -84,20 +84,20 @@ int main(){
             choice = getch();
 
             switch (choice) {
-                case '1':   addContact(contacts, lastContactID, idOfLoggedOnUser);
+                case '1':   addContact(contacts, lastContactIDinDB, idOfLoggedOnUser);
                             updateContactsDatabase(contacts, DELIMITER);
                             break;
                 case '2':   searchModeSwitch = FirstNameSearch;
-                            findContacts(contacts, lastContactID, searchModeSwitch);
+                            findContacts(contacts, lastContactIDinDB, searchModeSwitch);
                             break;
                 case '3':   searchModeSwitch = LastNameSearch;
-                            findContacts(contacts, lastContactID, searchModeSwitch);
+                            findContacts(contacts, lastContactIDinDB, searchModeSwitch);
                             break;
                 case '4':   displayContacts(contacts);
                             system("pause");
                             break;
                 case '5':   break;
-                case '6':   editContact(contacts, lastContactID);
+                case '6':   editContact(contacts, lastContactIDinDB);
                             break;
                 case '7':   changeUsersPassword(users, idOfLoggedOnUser);
                             break;
@@ -238,7 +238,7 @@ unsigned short importContactsDatabaseOfLoggedOnUser(vector<PhoneBook> &contacts,
     vector<string> splittedStrings;
     string lineOfText;
     PhoneBook person;
-    unsigned short lastContactID;
+    unsigned short lastContactIDinDB;
 
     if (!dbFile.good()) {
         system("cls");
@@ -254,7 +254,7 @@ unsigned short importContactsDatabaseOfLoggedOnUser(vector<PhoneBook> &contacts,
         while (getline(ss, singleValueFromLineOfText, DELIMITER)) {
             splittedStrings.emplace_back(singleValueFromLineOfText);
         }
-        
+
         //if userID == idOfLoggedOnUser
         if (stoi(splittedStrings.at(1)) == idOfLoggedOnUser) {
             person.contactID = stoi(splittedStrings.at(0));
@@ -266,21 +266,21 @@ unsigned short importContactsDatabaseOfLoggedOnUser(vector<PhoneBook> &contacts,
             person.address = splittedStrings.at(6);
             contacts.emplace_back(person);
         }
-        
-        lastContactID = person.contactID;
+
+        lastContactIDinDB = stoi(splittedStrings.at(0));
         splittedStrings.clear();
     }
-    
+
     dbFile.close();
-    return lastContactID;
+    return lastContactIDinDB;
 }
 
-void addContact(vector<PhoneBook> &contacts, unsigned short &lastContactID, short &idOfLoggedOnUser) {
+void addContact(vector<PhoneBook> &contacts, unsigned short &lastContactIDinDB, short &idOfLoggedOnUser) {
     PhoneBook person;
 
     system("cls");
-    person.contactID = lastContactID + 1;
-    lastContactID++;
+    person.contactID = lastContactIDinDB + 1;
+    lastContactIDinDB++;
     person.userID = idOfLoggedOnUser;
     cout << "Podaj imie: ";
     cin >> person.firstName;
@@ -346,7 +346,7 @@ void updateContactsDatabase(vector<PhoneBook> &contacts, const char &DELIMITER) 
     rename(oldName, newName);
 }
 
-void findContacts(vector<PhoneBook> &contacts, unsigned short &lastContactID, bool &searchModeSwitch) {
+void findContacts(vector<PhoneBook> &contacts, unsigned short &lastContactIDinDB, bool &searchModeSwitch) {
     bool contactFound = false;
     vector<PhoneBook>::iterator itr = contacts.begin(), lastContactPosition = contacts.end();
     string newValue = "", oldValue = "";
@@ -395,7 +395,7 @@ void displayContacts(vector<PhoneBook> &contacts) {
     cout << '\n';
 }
 
-void editContact(vector<PhoneBook> &contacts, unsigned short &lastContactID) {
+void editContact(vector<PhoneBook> &contacts, unsigned short &lastContactIDinDB) {
     char choice = ' ';
     short contactIDToEdit = 0;
     bool IDSearchSuccessful = false;
