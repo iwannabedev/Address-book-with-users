@@ -24,8 +24,8 @@ void updateUsersDatabase(vector<User> &users);
 short importUsersDatabase(vector<User> &users, const char &DELIMITER);
 User splitLineOfText(vector<User> &users, string stringToSplit, const char &DELIMITER);
 unsigned short importContactsDatabaseOfLoggedOnUser(vector<PhoneBook> &contacts, short &idOfLoggedOnUser, const char &DELIMITER);
-void addContact(vector<PhoneBook> &contacts, unsigned short &lastContactIDinDB, short &idOfLoggedOnUser);
-void updateContactsDatabase(vector<PhoneBook> &contacts, const char &DELIMITER);
+unsigned short addContact(vector<PhoneBook> &contacts, unsigned short &lastContactIDinDB, short &idOfLoggedOnUser);
+void updateContactsDatabase(vector<PhoneBook> &contacts, const char &DELIMITER, unsigned short &idOfLastAddedModifiedOrDeletedContact);
 void findContacts(vector<PhoneBook> &contacts, unsigned short &lastContactIDinDB, bool &searchModeSwitch);
 void displayContacts(vector<PhoneBook> &contacts);
 void editContact(vector<PhoneBook> &contacts, unsigned short &lastContactIDinDB);
@@ -42,6 +42,7 @@ int main(){
     unsigned short lastContactIDinDB = 0;
     const char DELIMITER = '|';
     short idOfLoggedOnUser = 0;
+    unsigned short idOfLastAddedModifiedOrDeletedContact = 0;
 
     numberOfUsers = importUsersDatabase(users, DELIMITER);
 
@@ -84,8 +85,8 @@ int main(){
             choice = getch();
 
             switch (choice) {
-                case '1':   addContact(contacts, lastContactIDinDB, idOfLoggedOnUser);
-                            updateContactsDatabase(contacts, DELIMITER);
+                case '1':   idOfLastAddedModifiedOrDeletedContact = addContact(contacts, lastContactIDinDB, idOfLoggedOnUser);
+                            updateContactsDatabase(contacts, DELIMITER, idOfLastAddedModifiedOrDeletedContact);
                             break;
                 case '2':   searchModeSwitch = FirstNameSearch;
                             findContacts(contacts, lastContactIDinDB, searchModeSwitch);
@@ -275,7 +276,7 @@ unsigned short importContactsDatabaseOfLoggedOnUser(vector<PhoneBook> &contacts,
     return lastContactIDinDB;
 }
 
-void addContact(vector<PhoneBook> &contacts, unsigned short &lastContactIDinDB, short &idOfLoggedOnUser) {
+unsigned short addContact(vector<PhoneBook> &contacts, unsigned short &lastContactIDinDB, short &idOfLoggedOnUser) {
     PhoneBook person;
 
     system("cls");
@@ -295,9 +296,10 @@ void addContact(vector<PhoneBook> &contacts, unsigned short &lastContactIDinDB, 
     getline(cin, person.address);
 
     contacts.emplace_back(person);
+    return person.contactID;
 }
 
-void updateContactsDatabase(vector<PhoneBook> &contacts, const char &DELIMITER) {
+void updateContactsDatabase(vector<PhoneBook> &contacts, const char &DELIMITER, unsigned short &idOfLastAddedModifiedOrDeletedContact) {
     vector<PhoneBook>::iterator itr = contacts.begin(), lastContactPosition = contacts.end();
     fstream dbFile, dbTempFile;
     dbFile.open("Adresaci.txt", ios::in);
@@ -323,19 +325,25 @@ void updateContactsDatabase(vector<PhoneBook> &contacts, const char &DELIMITER) 
         person.email = splittedStrings.at(5);
         person.address = splittedStrings.at(6);
 
-        if (person.contactID == lastContactPosition->contactID) {
-            dbTempFile << lastContactPosition->contactID << '|' << lastContactPosition->userID << '|' << lastContactPosition->firstName
-                << '|' << lastContactPosition->lastName << '|' << lastContactPosition->phoneNo << '|' << lastContactPosition->email
-                << '|' << lastContactPosition->address << '|' << '\n';
+        //adding edited contact
+        if (person.contactID == idOfLastAddedModifiedOrDeletedContact) {
+            for (itr; itr != lastContactPosition; ++itr) {
+                if (itr->contactID == idOfLastAddedModifiedOrDeletedContact) {
+                    dbTempFile << itr->contactID << '|' << itr->userID << '|' << itr->firstName << '|' << itr->lastName
+                        << '|' << itr->phoneNo << '|' << itr->email << '|' << itr->address << '|' << '\n';
+                }
+            }
         } else {
             dbTempFile << lineOfText << '\n';
         }
     }
 
-    if (person.contactID < lastContactPosition->contactID) {
+    //adding new contact
+    if (person.contactID < idOfLastAddedModifiedOrDeletedContact) {
         dbTempFile << lastContactPosition->contactID << '|' << lastContactPosition->userID << '|' << lastContactPosition->firstName
-        << '|' << lastContactPosition->lastName << '|' << lastContactPosition->phoneNo << '|' << lastContactPosition->email
-        << '|' << lastContactPosition->address << '|' << '\n';
+            << '|' << lastContactPosition->lastName << '|' << lastContactPosition->phoneNo << '|' << lastContactPosition->email
+            << '|' << lastContactPosition->address << '|' << '\n';
+
     }
 
     dbFile.close();
