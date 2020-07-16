@@ -50,7 +50,7 @@ int main(){
     while (true) {
         if (idOfLoggedOnUser == 0) {
             system("cls");
-            cout << ">>MENU GL�WNE<<\n";
+            cout << ">>MENU GŁÓWNE<<\n";
             cout << "1. Logowanie\n";
             cout << "2. Rejestracja\n";
             cout << "9. Zamknij program\n\n";
@@ -65,7 +65,7 @@ int main(){
                             break;
                 case '9':   exit(0);
                             break;
-                default:    cout << "\nNiepoprawny wyb�r. Spr�buj ponownie.\n";
+                default:    cout << "\nNiepoprawny wybór. Spróbuj ponownie.\n";
                             system("pause");
             }
         } else {
@@ -73,15 +73,15 @@ int main(){
             bool searchModeSwitch = false, FirstNameSearch = true, LastNameSearch = false;
 
             system("cls");
-            cout << ">>KSIY�KA ADRESOWA<<\n";
+            cout << ">>KSIĄŻKA ADRESOWA<<\n";
             cout << "1. Dodaj adresata\n";
             cout << "2. Wyszukaj po imieniu\n";
             cout << "3. Wyszukaj po nazwisku\n";
-            cout << "4. Wyswietl wszystkich adresatow\n";
-            cout << "5. Usun adresata\n";
+            cout << "4. Wyświetl wszystkich adresatów\n";
+            cout << "5. Usuń adresata\n";
             cout << "6. Edytuj adresata\n";
-            cout << "7. Zmien has3o\n";
-            cout << "9. Wyloguj sie\n";
+            cout << "7. Zmień hasło\n";
+            cout << "9. Wyloguj się\n";
 
             choice = getch();
 
@@ -108,7 +108,7 @@ int main(){
                             break;
                 case '9':   idOfLoggedOnUser = 0;
                             break;
-                default:    cout << "\nNiepoprawny wyb�r. Spr�buj ponownie.\n";
+                default:    cout << "\nNiepoprawny wybór. Spróbuj ponownie.\n";
                             system("pause");
             }
         }
@@ -127,23 +127,23 @@ short logInUser(vector<User> &users){
     for (itr; itr != lastUserPosition; ++itr) {
         if (itr->login == typedInLogin) {
             for (short numberOfAttempts = 0; numberOfAttempts < 3; numberOfAttempts++) {
-                cout << "Podaj haslo (ilooa pozosta3ych pr�b: " << 3-numberOfAttempts << "): " ;
+                cout << "Podaj haslo (ilość pozostałych prób: " << 3-numberOfAttempts << "): " ;
                 cin >> typedInPassword;
 
                 if (itr->password == typedInPassword) {
-                    cout << "Zalogowa3eo sie. Otwieram Twoj1 Ksi1?ke Adresow1..." << endl;
+                    cout << "Zalogowałeś sie. Otwieram Twoją Książkę Adresową..." << endl;
                     Sleep (1000);
                     return itr->id;
                 }
             }
 
-            cout << "Poda3es 3 razy b3edne has3o. Poczekaj 5 sekund przed kolejn1 pr�b1.\n\n";
+            cout << "Podałeś 3 razy błędne hasło. Poczekaj 5 sekund przed kolejną próbą.\n\n";
             Sleep(5000);
             return 0;
         }
     }
 
-    cout << "U?ytkownik " << typedInLogin << " nie istnieje!\n";
+    cout << "Użytkownik o id '" << typedInLogin << "' nie istnieje!\n";
     system("pause");
     return 0;
 }
@@ -153,7 +153,7 @@ void registerUser(vector<User> &users, short &numberOfUsers) {
     vector<User>::iterator itr = users.begin(), lastUserPosition = users.end();
     string userName;
     bool userExists = false;
-    cout << "Podaj nazwe uzytkownika: ";
+    cout << "Podaj nazwę użytkownika: ";
     cin >> userName;
 
     userExists = (numberOfUsers) ? true:false;
@@ -161,7 +161,7 @@ void registerUser(vector<User> &users, short &numberOfUsers) {
     while (userExists) {
         for (itr; itr != lastUserPosition; ++itr) {
             if (userName == itr->login) {
-                cout << "Taki uzytkownik istnieje. Wpisz inna nazwe uzytkownika: ";
+                cout << "Taki użytkownik już istnieje. Wpisz inną nazwę użytkownika: ";
                 cin >> userName;
                 itr = users.begin();
             }
@@ -172,12 +172,12 @@ void registerUser(vector<User> &users, short &numberOfUsers) {
     registeredUser.id = ++numberOfUsers;
     registeredUser.login = userName;
 
-    cout << "Podaj has3o: ";
+    cout << "Podaj hasło: ";
     cin >> registeredUser.password;
 
     users.emplace_back(registeredUser);
 
-    cout << "Rejestracja zakonczona" << endl;
+    cout << "Rejestracja zakończona." << endl;
     system("pause");
 }
 
@@ -200,7 +200,7 @@ short importUsersDatabase(vector<User> &users, const char &DELIMITER) {
 
     if (!usersDatabase.good()) {
         system("cls");
-        cout << "\nBrak pliku z baz1 u?ytkownik�w! \n\n";
+        cout << "\nBrak pliku z bazą użytkowników!\n\n";
         system("pause");
     }
 
@@ -247,7 +247,7 @@ unsigned short importContactsDatabaseOfLoggedOnUser(vector<PhoneBook> &contacts,
 
     if (!dbFile.good()) {
         system("cls");
-        cout << "\nBrak pliku z baz� kontakt�w!\n\n";
+        cout << "\nBrak pliku z bazą kontaktów!\n\n";
         system("pause");
     }
 
@@ -287,7 +287,7 @@ unsigned short addContact(vector<PhoneBook> &contacts, unsigned short &lastConta
     person.contactID = lastContactIDinDB + 1;
     lastContactIDinDB++;
     person.userID = idOfLoggedOnUser;
-    cout << "Podaj imie: ";
+    cout << "Podaj imię: ";
     cin >> person.firstName;
     cout << "Podaj nazwisko: ";
     cin >> person.lastName;
@@ -295,7 +295,7 @@ unsigned short addContact(vector<PhoneBook> &contacts, unsigned short &lastConta
     cin >> person.phoneNo;
     cout << "Podaj adres email: ";
     cin >> person.email;
-    cout << "Podaj pelny adres (ulica [nr], kod pocztowy, miasto): ";
+    cout << "Podaj pełny adres (ulica [nr], kod pocztowy, miasto): ";
     cin.sync();
     getline(cin, person.address);
 
@@ -369,7 +369,7 @@ void findContacts(vector<PhoneBook> &contacts, unsigned short &lastContactIDinDB
 
     //search by firstName
     if (searchModeSwitch == true) {
-        cout << "Podaj imie do wyszukania: ";
+        cout << "Podaj imię do wyszukania: ";
     }
     //search by lastName
     else {
@@ -389,7 +389,7 @@ void findContacts(vector<PhoneBook> &contacts, unsigned short &lastContactIDinDB
     }
 
     if (!contactFound) {
-        cout << '\n' << "Zaden kontakt nie spelnia kryterium wyszukiwania." << '\n' << '\n';
+        cout << "\nŻaden kontakt nie spełnia kryterium wyszukiwania.\n\n";
         system("pause");
     } else {
         cout << '\n';
@@ -417,18 +417,18 @@ unsigned short deleteContact(vector<PhoneBook> &contacts) {
 
     displayContacts(contacts);
 
-    cout << "\nPodaj ID kontaktu, ktory chcesz usunac: ";
+    cout << "\nPodaj ID kontaktu, który chcesz usunąć: ";
     cin >> choice;
 
     for (itr; itr != lastContactPosition; ++itr) {
         if (itr->contactID == choice) {
-            cout << "Czy na pewno chcesz usunac ten kontakt? Potwierdz: [t/n]?";
+            cout << "Czy na pewno chcesz usunąć ten kontakt? Potwierdź klawiszem: [t/n]?";
             choiceConfirmed = getch();
 
             if (choiceConfirmed == 't') {
                 canBeDeleted = true;
                 itr = contacts.erase(itr);
-                cout << "\nKontakt zostal pomyslnie usuniety.\n";
+                cout << "\nKontakt został pomyślnie usunięty.\n";
                 system("pause");
                 break;
             }
@@ -451,25 +451,25 @@ unsigned short editContact(vector<PhoneBook> &contacts) {
 
     displayContacts(contacts);
 
-    cout << "Podaj ID kontaktu, ktory chcesz edytowac: ";
+    cout << "Podaj ID kontaktu, który chcesz edytowac: ";
     cin >> contactIDToEdit;
 
     system("cls");
-    cout << "Ktora informacje chcesz zmienic?: \n";
-    cout << "1 - imie\n";
+    cout << "Którą informację chcesz zmienić?: \n";
+    cout << "1 - imię\n";
     cout << "2 - nazwisko\n";
     cout << "3 - numer telefonu\n";
     cout << "4 - email\n";
     cout << "5 - adres\n";
-    cout << "6 - powrot do menu\n\n";
+    cout << "6 - powrót do menu\n\n";
     choice = getch();
-    cout << "Twoj wybor: " << choice << '\n';
+    cout << "Twój wybór: " << choice << '\n';
 
     for (itr; itr != lastContactPosition; ++itr) {
         if (itr->contactID == contactIDToEdit) {
             IDSearchSuccessful = true;
             switch (choice) {
-                case '1':   cout << "Podaj nowe imie: ";
+                case '1':   cout << "Podaj nowe imię: ";
                             cin >> itr->firstName;
 
                             break;
@@ -486,7 +486,7 @@ unsigned short editContact(vector<PhoneBook> &contacts) {
                             cin >> itr->address;
                             break;
                 case '6':   break;
-                default:    cout << "\nNiepoprawny wybor. Spr�buj ponownie.\n";
+                default:    cout << "\nNiepoprawny wybór. Spróbuj ponownie.\n";
                             system("pause");
             }
         }
@@ -506,9 +506,9 @@ void changeUsersPassword(vector<User> &users, short &idOfLoggedOnUser){
     vector<User>::iterator itr = users.begin(), lastUserPosition = users.end();
     fstream dbFile;
 
-    cout << "\nPodaj nowe has�o: ";
+    cout << "\nPodaj nowe hasło: ";
     cin >> password1;
-    cout << "Podaj ponownie nowe has�o: ";
+    cout << "Podaj ponownie nowe hasło: ";
     cin >> password2;
 
     if (password1 == password2) {
@@ -519,10 +519,10 @@ void changeUsersPassword(vector<User> &users, short &idOfLoggedOnUser){
             dbFile << itr->id << '|' << itr->login << '|' << itr->password<< '|' << '\n';
         }
 
-        cout << "\nHas�o zosta�o pomy�lnie zmienione!\n";
+        cout << "\nHasło zostało pomyślnie zmienione!\n";
         system("pause");
     } else {
-        cout << "Wprowadzone has�a s� od siebie r�ne! Zmiana has�a zako�czona niepowodzeniem.\n";
+        cout << "Wprowadzone hasła są od siebie różne! Zmiana hasła zakończona niepowodzeniem.\n";
         system("pause");
     }
     dbFile.close();
