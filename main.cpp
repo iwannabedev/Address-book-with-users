@@ -28,7 +28,7 @@ unsigned short addContact(vector<PhoneBook> &contacts, unsigned short &lastConta
 void updateContactsDatabase(vector<PhoneBook> &contacts, const char &DELIMITER, unsigned short &idOfLastAddedModifiedOrDeletedContact);
 void findContacts(vector<PhoneBook> &contacts, unsigned short &lastContactIDinDB, bool &searchModeSwitch);
 void displayContacts(vector<PhoneBook> &contacts);
-void editContact(vector<PhoneBook> &contacts, unsigned short &lastContactIDinDB);
+unsigned short editContact(vector<PhoneBook> &contacts);
 void changeUsersPassword(vector<User> &users, short &idOfLoggedOnUser);
 
 int main(){
@@ -98,7 +98,8 @@ int main(){
                             system("pause");
                             break;
                 case '5':   break;
-                case '6':   editContact(contacts, lastContactIDinDB);
+                case '6':   idOfLastAddedModifiedOrDeletedContact = editContact(contacts);
+                            updateContactsDatabase(contacts, DELIMITER, idOfLastAddedModifiedOrDeletedContact);
                             break;
                 case '7':   changeUsersPassword(users, idOfLoggedOnUser);
                             break;
@@ -325,6 +326,7 @@ void updateContactsDatabase(vector<PhoneBook> &contacts, const char &DELIMITER, 
         person.email = splittedStrings.at(5);
         person.address = splittedStrings.at(6);
 
+        splittedStrings.clear();
         //adding edited contact
         if (person.contactID == idOfLastAddedModifiedOrDeletedContact) {
             for (itr; itr != lastContactPosition; ++itr) {
@@ -333,6 +335,7 @@ void updateContactsDatabase(vector<PhoneBook> &contacts, const char &DELIMITER, 
                         << '|' << itr->phoneNo << '|' << itr->email << '|' << itr->address << '|' << '\n';
                 }
             }
+        //adding existing contact
         } else {
             dbTempFile << lineOfText << '\n';
         }
@@ -403,7 +406,7 @@ void displayContacts(vector<PhoneBook> &contacts) {
     cout << '\n';
 }
 
-void editContact(vector<PhoneBook> &contacts, unsigned short &lastContactIDinDB) {
+unsigned short editContact(vector<PhoneBook> &contacts) {
     char choice = ' ';
     short contactIDToEdit = 0;
     bool IDSearchSuccessful = false;
@@ -457,7 +460,7 @@ void editContact(vector<PhoneBook> &contacts, unsigned short &lastContactIDinDB)
         system("pause");
     }
 
-//    updateContactsDatabase
+    return contactIDToEdit;
 }
 
 void changeUsersPassword(vector<User> &users, short &idOfLoggedOnUser){
