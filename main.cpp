@@ -505,7 +505,6 @@ void changeUsersPassword(vector<User> &users, short &idOfLoggedOnUser){
     short indexOfLoggedOnUser = idOfLoggedOnUser - 1;
     vector<User>::iterator itr = users.begin(), lastUserPosition = users.end();
     fstream dbFile;
-    dbFile.open("Uzytkownicy.txt", ios::out);
 
     cout << "\nPodaj nowe has³o: ";
     cin >> password1;
@@ -513,6 +512,7 @@ void changeUsersPassword(vector<User> &users, short &idOfLoggedOnUser){
     cin >> password2;
 
     if (password1 == password2) {
+        dbFile.open("Uzytkownicy.txt", ios::out);
         users.at(indexOfLoggedOnUser).password = password1;
 
         for (itr; itr != lastUserPosition; ++itr) {
