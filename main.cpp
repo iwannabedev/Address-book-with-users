@@ -249,6 +249,7 @@ unsigned short importContactsDatabaseOfLoggedOnUser(vector<PhoneBook> &contacts,
         system("cls");
         cout << "\nBrak pliku z bazą kontaktów!\n\n";
         system("pause");
+        return 0;
     }
 
     contacts.clear();
@@ -312,6 +313,7 @@ void updateContactsDatabase(vector<PhoneBook> &contacts, const char &DELIMITER, 
     string singleValueFromLineOfText;
     vector<string> splittedStrings;
     PhoneBook person;
+    person.contactID = 0;
     lastContactPosition--;
 
     while (getline(dbFile, lineOfText)) {
@@ -349,7 +351,6 @@ void updateContactsDatabase(vector<PhoneBook> &contacts, const char &DELIMITER, 
         dbTempFile << lastContactPosition->contactID << '|' << lastContactPosition->userID << '|' << lastContactPosition->firstName
             << '|' << lastContactPosition->lastName << '|' << lastContactPosition->phoneNo << '|' << lastContactPosition->email
             << '|' << lastContactPosition->address << '|' << '\n';
-
     }
 
     dbFile.close();
