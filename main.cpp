@@ -314,7 +314,6 @@ void updateContactsDatabase(vector<PhoneBook> &contacts, const char &DELIMITER, 
     vector<string> splittedStrings;
     PhoneBook person;
     person.contactID = 0;
-    lastContactPosition--;
 
     while (getline(dbFile, lineOfText)) {
         stringstream ss(lineOfText);
@@ -332,6 +331,7 @@ void updateContactsDatabase(vector<PhoneBook> &contacts, const char &DELIMITER, 
         person.address = splittedStrings.at(6);
 
         splittedStrings.clear();
+
         //adding edited or deleted contact
         if (person.contactID == idOfLastAddedModifiedOrDeletedContact) {
             for (itr; itr != lastContactPosition; ++itr) {
@@ -348,6 +348,7 @@ void updateContactsDatabase(vector<PhoneBook> &contacts, const char &DELIMITER, 
 
     //adding new contact
     if (person.contactID < idOfLastAddedModifiedOrDeletedContact) {
+        lastContactPosition--;
         dbTempFile << lastContactPosition->contactID << '|' << lastContactPosition->userID << '|' << lastContactPosition->firstName
             << '|' << lastContactPosition->lastName << '|' << lastContactPosition->phoneNo << '|' << lastContactPosition->email
             << '|' << lastContactPosition->address << '|' << '\n';
