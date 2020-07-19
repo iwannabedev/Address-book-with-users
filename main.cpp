@@ -8,20 +8,20 @@
 using namespace std;
 
 struct User {
-    short id;
+    unsigned short id;
     string login, password;
-
 };
 
 struct PhoneBook {
-    short contactID, userID;
+    unsigned short contactID, userID;
     string firstName, lastName, phoneNo, email, address;
 };
 
-short logInUser(vector<User> &users);
-void registerUser(vector<User> &users, short &numberOfUsers);
+unsigned short logInUser(vector<User> &users);
+void registerUser(vector<User> &users, unsigned short &numberOfUsers);
+User createUser(vector<User> &users, string typedInLogin, string typedInPassword, unsigned short &numberOfUsers);
 void updateUsersDatabase(vector<User> &users);
-short importUsersDatabase(vector<User> &users, const char &DELIMITER);
+unsigned short importUsersDatabase(vector<User> &users, const char &DELIMITER);
 User splitLineOfText(vector<User> &users, string stringToSplit, const char &DELIMITER);
 unsigned short importContactsDatabaseOfLoggedOnUser(vector<PhoneBook> &contacts, short &idOfLoggedOnUser, const char &DELIMITER);
 unsigned short addContact(vector<PhoneBook> &contacts, unsigned short &lastContactIDinDB, short &idOfLoggedOnUser);
@@ -39,7 +39,7 @@ int main(){
     char choice = '0';
     vector<User> users;
     vector<PhoneBook> contacts;
-    short numberOfUsers = 0;
+    unsigned short numberOfUsers = 0;
     unsigned short lastContactIDinDB = 0;
     const char DELIMITER = '|';
     short idOfLoggedOnUser = 0;
@@ -116,18 +116,17 @@ int main(){
     return 0;
 }
 
-short logInUser(vector<User> &users){
+unsigned short logInUser(vector<User> &users){
     vector<User>::iterator itr = users.begin(), lastUserPosition = users.end();
     string typedInLogin, typedInPassword;
-    short numberOfAttempts = 3;
 
     cout << "Podaj login: ";
     cin >> typedInLogin;
 
     for (itr; itr != lastUserPosition; ++itr) {
         if (itr->login == typedInLogin) {
-            for (short numberOfAttempts = 0; numberOfAttempts < 3; numberOfAttempts++) {
-                cout << "Podaj haslo (ilość pozostałych prób: " << 3-numberOfAttempts << "): " ;
+            for (unsigned short numberOfAttempts = 3; numberOfAttempts > 0; --numberOfAttempts) {
+                cout << "Podaj haslo (ilość pozostałych prób: " << 0 + numberOfAttempts << "): " ;
                 cin >> typedInPassword;
 
                 if (itr->password == typedInPassword) {
@@ -137,48 +136,49 @@ short logInUser(vector<User> &users){
                 }
             }
 
-            cout << "Podałeś 3 razy błędne hasło. Poczekaj 5 sekund przed kolejną próbą.\n\n";
+            cout << "\nPodałeś 3 razy błędne hasło. Poczekaj 5 sekund przed kolejną próbą.\n\n";
             Sleep(5000);
             return 0;
         }
     }
 
-    cout << "Użytkownik o id '" << typedInLogin << "' nie istnieje!\n";
+    cout << "Użytkownik '" << typedInLogin << "' nie istnieje!\n";
     system("pause");
     return 0;
 }
 
-void registerUser(vector<User> &users, short &numberOfUsers) {
+void registerUser(vector<User> &users, unsigned short &numberOfUsers) {
+    string typedInLogin, typedInPassword;
+
+    cout << "Podaj login nowego użytkownika: ";
+    cin >> typedInLogin;
+    cout << "Podaj hasło: ";
+    cin >> typedInPassword;
+
+    users.emplace_back(createUser(users, typedInLogin, typedInPassword, numberOfUsers));
+    cout << "\nRejestracja zakończona pomyślnie.\n";
+    system("pause");
+}
+
+User createUser(vector<User> &users, string typedInLogin, string typedInPassword, unsigned short &numberOfUsers) {
     User registeredUser;
     vector<User>::iterator itr = users.begin(), lastUserPosition = users.end();
-    string userName;
-    bool userExists = false;
-    cout << "Podaj nazwę użytkownika: ";
-    cin >> userName;
 
-    userExists = (numberOfUsers) ? true:false;
-
-    while (userExists) {
-        for (itr; itr != lastUserPosition; ++itr) {
-            if (userName == itr->login) {
-                cout << "Taki użytkownik już istnieje. Wpisz inną nazwę użytkownika: ";
-                cin >> userName;
-                itr = users.begin();
-            }
+    for (itr; itr != lastUserPosition;) {
+        if (typedInLogin == itr->login) {
+            cout << "Taki użytkownik już istnieje. Wpisz inną nazwę użytkownika: ";
+            cin >> typedInLogin;
+            itr = users.begin();
+        } else {
+            ++itr;
         }
-        userExists = false;
     }
 
     registeredUser.id = ++numberOfUsers;
-    registeredUser.login = userName;
+    registeredUser.login = typedInLogin;
+    registeredUser.password = typedInPassword;
 
-    cout << "Podaj hasło: ";
-    cin >> registeredUser.password;
-
-    users.emplace_back(registeredUser);
-
-    cout << "Rejestracja zakończona." << endl;
-    system("pause");
+    return registeredUser;
 }
 
 void updateUsersDatabase(vector<User> &users) {
@@ -193,10 +193,10 @@ void updateUsersDatabase(vector<User> &users) {
     usersDatabase.close();
 }
 
-short importUsersDatabase(vector<User> &users, const char &DELIMITER) {
+unsigned short importUsersDatabase(vector<User> &users, const char &DELIMITER) {
     fstream usersDatabase;
     usersDatabase.open("Uzytkownicy.txt", ios::in);
-    short lastUserID;
+    unsigned short lastUserID;
 
     if (!usersDatabase.good()) {
         system("cls");
@@ -314,7 +314,6 @@ void updateContactsDatabase(vector<PhoneBook> &contacts, const char &DELIMITER, 
     vector<string> splittedStrings;
     PhoneBook person;
     person.contactID = 0;
-    lastContactPosition--;
 
     while (getline(dbFile, lineOfText)) {
         stringstream ss(lineOfText);
@@ -332,6 +331,7 @@ void updateContactsDatabase(vector<PhoneBook> &contacts, const char &DELIMITER, 
         person.address = splittedStrings.at(6);
 
         splittedStrings.clear();
+
         //adding edited or deleted contact
         if (person.contactID == idOfLastAddedModifiedOrDeletedContact) {
             for (itr; itr != lastContactPosition; ++itr) {
@@ -348,6 +348,7 @@ void updateContactsDatabase(vector<PhoneBook> &contacts, const char &DELIMITER, 
 
     //adding new contact
     if (person.contactID < idOfLastAddedModifiedOrDeletedContact) {
+        lastContactPosition--;
         dbTempFile << lastContactPosition->contactID << '|' << lastContactPosition->userID << '|' << lastContactPosition->firstName
             << '|' << lastContactPosition->lastName << '|' << lastContactPosition->phoneNo << '|' << lastContactPosition->email
             << '|' << lastContactPosition->address << '|' << '\n';
