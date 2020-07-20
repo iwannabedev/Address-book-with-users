@@ -103,7 +103,7 @@ int main(){
                             updateContactsDatabase(contacts, DELIMITER, idOfLastAddedModifiedOrDeletedContact);
                             break;
                 case '6':   idOfLastAddedModifiedOrDeletedContact = editContact(contacts);
-                            updateContactsDatabase(contacts, DELIMITER, idOfLastAddedModifiedOrDeletedContact);
+                            if (idOfLastAddedModifiedOrDeletedContact) updateContactsDatabase(contacts, DELIMITER, idOfLastAddedModifiedOrDeletedContact);
                             break;
                 case '7':   changeUsersPassword(users, idOfLoggedOnUser);
                             break;
@@ -501,6 +501,7 @@ unsigned short editContact(vector<PhoneBook> &contacts) {
     if (!IDSearchSuccessful) {
         cout << "\nBrak kontaktu o podanym ID.\n";
         system("pause");
+        return 0;
     }
 
     return contactIDToEdit;
