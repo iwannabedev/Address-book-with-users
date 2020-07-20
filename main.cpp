@@ -505,27 +505,20 @@ unsigned short editContact(vector<PhoneBook> &contacts) {
 void changeUsersPassword(vector<User> &users, short &idOfLoggedOnUser){
     string password1, password2;
     short indexOfLoggedOnUser = idOfLoggedOnUser - 1;
-    vector<User>::iterator itr = users.begin(), lastUserPosition = users.end();
-    fstream dbFile;
 
     cout << "\nPodaj nowe hasło: ";
     cin >> password1;
-    cout << "Podaj ponownie nowe hasło: ";
+    cout << "Potwierdź nowe hasło: ";
     cin >> password2;
 
     if (password1 == password2) {
-        dbFile.open("Uzytkownicy.txt", ios::out);
         users.at(indexOfLoggedOnUser).password = password1;
-
-        for (itr; itr != lastUserPosition; ++itr) {
-            dbFile << itr->id << '|' << itr->login << '|' << itr->password<< '|' << '\n';
-        }
+        updateUsersDatabase(users);
 
         cout << "\nHasło zostało pomyślnie zmienione!\n";
         system("pause");
     } else {
-        cout << "Wprowadzone hasła są od siebie różne! Zmiana hasła zakończona niepowodzeniem.\n";
+        cout << "\nWprowadzone hasła są od siebie różne! Zmiana hasła zakończona niepowodzeniem.\n";
         system("pause");
     }
-    dbFile.close();
 }
