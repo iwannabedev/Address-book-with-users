@@ -24,6 +24,7 @@ void updateUsersDatabase(vector<User> &users);
 unsigned short importUsersDatabase(vector<User> &users, const char &DELIMITER);
 User splitLineOfText(vector<User> &users, string stringToSplit, const char &DELIMITER);
 unsigned short importContactsDatabaseOfLoggedOnUser(vector<PhoneBook> &contacts, short &idOfLoggedOnUser, const char &DELIMITER);
+PhoneBook createContact(vector<string> &contactData);
 unsigned short addContact(vector<PhoneBook> &contacts, unsigned short &lastContactIDinDB, short &idOfLoggedOnUser);
 void updateContactsDatabase(vector<PhoneBook> &contacts, const char &DELIMITER, unsigned short &idOfLastAddedModifiedOrDeletedContact);
 void findContacts(vector<PhoneBook> &contacts, unsigned short &lastContactIDinDB, bool &searchModeSwitch);
@@ -244,7 +245,7 @@ unsigned short importContactsDatabaseOfLoggedOnUser(vector<PhoneBook> &contacts,
     vector<string> splittedStrings;
     string lineOfText;
     PhoneBook person;
-    unsigned short lastContactIDinDB;
+    unsigned short contactID, userID, lastContactIDinDB;
 
     if (!dbFile.good()) {
         system("cls");
@@ -262,24 +263,33 @@ unsigned short importContactsDatabaseOfLoggedOnUser(vector<PhoneBook> &contacts,
             splittedStrings.emplace_back(singleValueFromLineOfText);
         }
 
-        //if userID == idOfLoggedOnUser
-        if (stoi(splittedStrings.at(1)) == idOfLoggedOnUser) {
-            person.contactID = stoi(splittedStrings.at(0));
-            person.userID = stoi(splittedStrings.at(1));
-            person.firstName = splittedStrings.at(2);
-            person.lastName = splittedStrings.at(3);
-            person.phoneNo = splittedStrings.at(4);
-            person.email = splittedStrings.at(5);
-            person.address = splittedStrings.at(6);
+        contactID = stoi(splittedStrings.at(0));
+        userID = stoi(splittedStrings.at(1));
+        if (userID == idOfLoggedOnUser) {
+            person = createContact(splittedStrings);
             contacts.emplace_back(person);
         }
 
-        lastContactIDinDB = stoi(splittedStrings.at(0));
+        lastContactIDinDB = contactID;
         splittedStrings.clear();
     }
 
     dbFile.close();
     return lastContactIDinDB;
+}
+
+PhoneBook createContact(vector<string> &contactData) {
+    PhoneBook person;
+
+    person.contactID = stoi(contactData.at(0));
+    person.userID = stoi(contactData.at(1));
+    person.firstName = contactData.at(2);
+    person.lastName = contactData.at(3);
+    person.phoneNo = contactData.at(4);
+    person.email = contactData.at(5);
+    person.address = contactData.at(6);
+
+    return person;
 }
 
 unsigned short addContact(vector<PhoneBook> &contacts, unsigned short &lastContactIDinDB, short &idOfLoggedOnUser) {
@@ -323,17 +333,10 @@ void updateContactsDatabase(vector<PhoneBook> &contacts, const char &DELIMITER, 
            splittedStrings.emplace_back(singleValueFromLineOfText);
         }
 
-        person.contactID = stoi(splittedStrings.at(0));
-        person.userID = stoi(splittedStrings.at(1));
-        person.firstName = splittedStrings.at(2);
-        person.lastName = splittedStrings.at(3);
-        person.phoneNo = splittedStrings.at(4);
-        person.email = splittedStrings.at(5);
-        person.address = splittedStrings.at(6);
-
+        person = createContact(splittedStrings);
         splittedStrings.clear();
 
-        //adding edited or deleted contact
+        //adding edited or skipping deleted contact
         if (person.contactID == idOfLastAddedModifiedOrDeletedContact) {
             for (itr; itr != lastContactPosition; ++itr) {
                 if (itr->contactID == idOfLastAddedModifiedOrDeletedContact) {
